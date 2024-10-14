@@ -34,7 +34,7 @@ const UserSchema: Schema<IUser> = new Schema(
         },
         phone: {
             type: String,
-            required: [true, "Email is required"],
+            required: [true, "Phone number is required"],
             unique: true,
             match: [/^[0-9]{10}$/, "Please enter a valid phone number"],
         },
@@ -57,6 +57,7 @@ const UserSchema: Schema<IUser> = new Schema(
             type: String,
             required: [true, "Login type is required"],
             enum: ["EMAIL", "GOOGLE"],
+            default: "EMAIL",
         },
         verifyCode: {
             type: String,

@@ -9,8 +9,8 @@ export interface IUser extends Document {
     password: string;
     googleId?: string;
     loginType: "EMAIL" | "GOOGLE";
-    verifyCode: string;
-    verifyCodeExpiry: Date;
+    verifyCode: string | null;
+    verifyCodeExpiry: Date | null;
     isVerified: boolean;
 }
 

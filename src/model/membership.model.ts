@@ -8,9 +8,13 @@ export interface IMembership extends Document {
     membership_name: string;
     membership_description: string;
     membership_isAvailable: boolean;
-    membership_validity: number;
-    membership_price: number;
-    membership_current_offer: number; // this will add in easy to handle the offers in future
+    membership_plans: {
+        duration: number;
+        price: number;
+        current_offer: number;
+    };
+    membership_image: string;
+    membership_perks: string[];
 }
 
 const membershipSchema: Schema<IMembership> = new Schema<IMembership>({
@@ -30,22 +34,32 @@ const membershipSchema: Schema<IMembership> = new Schema<IMembership>({
         type: Boolean,
         required: true,
     },
-    membership_validity: {
-        type: Number,
-        required: true,
+    membership_plans: [
+        {
+            duration: {
+                type: Number, // Duration in months (e.g., 3, 6, 12)
+                required: true,
+            },
+            price: {
+                type: Number, // Price for this duration
+                required: true,
+            },
+            current_offer: {
+                type: Number,
+                default: 0, // Any offer specific to this plan
+            },
+        },
+    ],
+    membership_image: {
+        type: String,
     },
-    membership_price: {
-        type: Number,
-        required: true,
-    },
-    membership_current_offer: {
-        type: Number,
-        required: true,
+    membership_perks: {
+        type: [String],
     },
 });
 
-const membershipModel =
+const MembershipModel =
     (models.Membership as Model<IMembership>) ||
     model<IMembership>("Membership", membershipSchema);
 
-export default membershipModel;
+export default MembershipModel;

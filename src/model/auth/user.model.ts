@@ -34,7 +34,6 @@ const UserSchema: Schema<IUser> = new Schema(
         },
         phone: {
             type: String,
-            required: [true, "Phone number is required"],
             unique: true,
             match: [/^[0-9]{10}$/, "Please enter a valid phone number"],
         },
@@ -61,11 +60,9 @@ const UserSchema: Schema<IUser> = new Schema(
         },
         verifyCode: {
             type: String,
-            required: [true, "Verify code is required"],
         },
         verifyCodeExpiry: {
             type: Date,
-            required: [true, "Verify code expiry is required"],
             default: Date.now,
         },
         isVerified: {

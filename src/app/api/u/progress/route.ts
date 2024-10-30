@@ -14,6 +14,8 @@ export async function GET(request: Request) {
 
     const _user: User = session?.user as User;
 
+    console.log("_user -> ", _user);
+
     if (!session || !_user) {
         return Response.json(
             {
@@ -109,7 +111,7 @@ export async function GET(request: Request) {
         }
 
         // reverse the array in the userProgress weightHistory
-        userProgress[0].weightHistory.reverse();
+        userProgress[0]?.weightHistory.reverse();
 
         return Response.json({
             success: true,
@@ -120,7 +122,7 @@ export async function GET(request: Request) {
         return Response.json(
             {
                 success: false,
-                message: "Error while getting the progress of user",
+                message: "Error while getting the progress of user" + error,
             },
             {
                 status: 500,

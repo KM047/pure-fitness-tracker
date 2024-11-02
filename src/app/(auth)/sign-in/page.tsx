@@ -50,7 +50,7 @@ const SignInPage = () => {
         // console.log(result);
         setIsSubmitting(false);
 
-        console.log(result);
+        // console.log(result);
         if (result?.error) {
             if (result.error == "CredentialsSignInError") {
                 toast({

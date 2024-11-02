@@ -1,7 +1,6 @@
 import dbConnect from "@/lib/dbConnect";
 import { getServerSession, User } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/options";
-import UserModel, { IUser } from "@/model/auth/user.model";
 
 import MembershipModel from "@/model/membership.model";
 import UserMembershipModel, {
@@ -111,7 +110,7 @@ export async function POST(request: Request) {
 
         // if the user already has membership
     } catch (error) {
-        console.log(error);
+        // console.log(error);
 
         console.log("Error while adding user membership", error);
 
@@ -127,44 +126,3 @@ export async function POST(request: Request) {
     }
 }
 
-export async function GET(request: Request) {
-    await dbConnect();
-
-    const session = await getServerSession(authOptions);
-
-    const user = session?.user as User;
-
-    if (!session || !user) {
-        return Response.json(
-            {
-                success: false,
-                message: "Not authenticated",
-            },
-            {
-                status: 401,
-            }
-        );
-    }
-
-    if (user?.role != "ADMIN") {
-        return Response.json(
-            {
-                success: false,
-                message: "Unauthorized to access this route",
-            },
-            {
-                status: 401,
-            }
-        );
-    }
-
-    return Response.json(
-        {
-            success: true,
-            messages: "✅ this route only access the admin",
-        },
-        {
-            status: 200,
-        }
-    );
-}

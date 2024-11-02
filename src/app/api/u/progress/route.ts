@@ -14,7 +14,7 @@ export async function GET(request: Request) {
 
     const _user: User = session?.user as User;
 
-    console.log("_user -> ", _user);
+    // console.log("_user -> ", _user);
 
     if (!session || !_user) {
         return Response.json(

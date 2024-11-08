@@ -6,13 +6,13 @@ import MembershipModel from "@/model/membership.model";
 import UserMembershipModel, {
     IUserMembership,
 } from "@/model/userMembership.model";
+import { errorResponse, jsonResponse } from "@/helpers/responseUtils";
+import { NextRequest } from "next/server";
 
-export async function POST(request: Request) {
+// this route only get the details about the subscribed user memberships
+
+export async function GET(request: NextRequest) {
     await dbConnect();
-
-    // code for the adding the membership of the user
-
-    const { _id, membershipId, duration, startedFrom } = await request.json();
 
     try {
         const session = await getServerSession(authOptions);
@@ -20,109 +20,131 @@ export async function POST(request: Request) {
         const user = session?.user as User;
 
         if (!session || !user) {
-            return Response.json(
-                {
-                    success: false,
-                    message: "Not authenticated",
-                },
-                {
-                    status: 401,
-                }
-            );
+            return jsonResponse({
+                success: false,
+                message: "Not authenticated",
+                status: 401,
+            });
         }
 
         if (user?.role != "ADMIN") {
-            return Response.json(
-                {
-                    success: false,
-                    message: "Unauthorized",
-                },
-                {
-                    status: 401,
-                }
-            );
-        }
-
-        const membership = await MembershipModel.findById(membershipId);
-
-        if (!membership) {
-            return Response.json(
-                {
-                    success: false,
-                    message: "Membership not found",
-                },
-                {
-                    status: 400,
-                }
-            );
-        }
-
-        const userMembership: IUserMembership | null =
-            await UserMembershipModel.findOne({
-                userId: _id,
-            });
-
-        // what if I update the membership of that id but it doesn't exist then i will create that
-        if (userMembership) {
-            // this shows that it has already membership so update it
-
-            if (userMembership.membershipId != membershipId) {
-                userMembership.membershipId = membershipId;
-            }
-
-            userMembership.membership_validity = duration;
-            userMembership.membership_status = true;
-            userMembership.membership_start_date = startedFrom;
-
-            userMembership.save();
-
-            return Response.json(
-                {
-                    success: true,
-                    message: "User membership updated",
-                },
-                {
-                    status: 200,
-                }
-            );
-        } else {
-            // create the user membership
-            const newUserMembership = new UserMembershipModel({
-                userId: _id,
-                membershipId: membershipId,
-                membership_validity: duration,
-                membership_status: true,
-                membership_start_date: startedFrom,
-            });
-
-            newUserMembership.save();
-
-            return Response.json(
-                {
-                    success: true,
-                    message: "User membership created",
-                },
-                {
-                    status: 200,
-                }
-            );
-        }
-
-        // if the user already has membership
-    } catch (error) {
-        // console.log(error);
-
-        console.log("Error while adding user membership", error);
-
-        return Response.json(
-            {
+            return jsonResponse({
                 success: false,
-                message: "Error while adding user membership",
-            },
+                message:
+                    "Unauthorized to access this route only an admin can access this route",
+                status: 401,
+            });
+        }
+
+        /**
+         * Make the aggregate query that where the it gives the result like user some info and he
+         * has some membership or not its starting date and ending date
+         * the validity of the membership
+         *
+         */
+
+        const pipeline = [
+            // Step 1: Lookup to populate user details from User collection
             {
-                status: 500,
-            }
-        );
+                $lookup: {
+                    from: "users", // The collection to join (Users)
+                    localField: "userId", // Field from the current collection
+                    foreignField: "_id", // Field from Users collection
+                    as: "userInfo", // Output array field for user information
+                },
+            },
+
+            // Step 2: Unwind userInfo array to make each user info a separate document
+            {
+                $unwind: {
+                    path: "$userInfo",
+                    preserveNullAndEmptyArrays: true,
+                },
+            },
+
+            // Step 3: Lookup to populate membership details from Membership collection
+            {
+                $lookup: {
+                    from: "memberships", // The collection to join (Memberships)
+                    localField: "membershipId", // Field from the current collection
+                    foreignField: "_id", // Field from Memberships collection
+                    as: "membershipInfo", // Output array field for membership information
+                },
+            },
+
+            // Step 4: Unwind membershipInfo array to make each membership info a separate document
+            {
+                $unwind: {
+                    path: "$membershipInfo",
+                    preserveNullAndEmptyArrays: true,
+                },
+            },
+
+            // Step 5: Add a computed field for membership validity
+            {
+                $addFields: {
+                    isMembershipValid: {
+                        $cond: {
+                            if: {
+                                $and: [
+                                    { $eq: ["$membershipStatus", true] }, // Membership status must be true
+                                    {
+                                        $gte: [
+                                            "$membershipEndDate",
+                                            new Date(),
+                                        ],
+                                    }, // endDate >= today
+                                    {
+                                        $lte: [
+                                            "$membershipStartDate",
+                                            new Date(),
+                                        ],
+                                    }, // startDate <= today
+                                ],
+                            },
+                            then: true,
+                            else: false,
+                        },
+                    },
+                },
+            },
+
+            {
+                $project: {
+                    "userInfo.name": 1,
+                    "userInfo.email": 1,
+                    membershipStatus: 1,
+                    membershipValidity: 1,
+                    membershipStartDate: 1,
+                    membershipEndDate: 1,
+                    isMembershipValid: 1,
+                    feePaid: 1,
+                    actualFee: 1,
+                    feeStatus: 1,
+                },
+            },
+        ];
+
+        const membership = await UserMembershipModel.aggregate(pipeline);
+
+        if (membership.length == 0) {
+            return jsonResponse({
+                success: false,
+                message: "No membership plans found",
+                data: null,
+            });
+        }
+
+        return jsonResponse({
+            success: true,
+            message: "The membership plans fetched successfully",
+            data: membership,
+        });
+    } catch (error) {
+        return errorResponse({
+            error,
+            message: "Error occurred while you fetching the membership plans",
+            status: 500,
+        });
     }
 }
-

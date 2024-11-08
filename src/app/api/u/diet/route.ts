@@ -1,25 +1,66 @@
 import dbConnection from "@/lib/dbConnect";
 import { getServerSession, User } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/options";
-export async function POST(request: Request) {
+import { errorResponse, jsonResponse } from "@/helpers/responseUtils";
+import UserDietPlanModel from "@/model/userDietPlan.model";
+import { NextRequest } from "next/server";
+import mongoose from "mongoose";
+
+// This route is to get the diet plan of the user by userId
+export async function GET(request: NextRequest) {
     await dbConnection();
 
     const session = await getServerSession(authOptions);
 
     const _user: User = session?.user as User;
 
-    try {
-    } catch (error) {
-        console.log("Error while registering user", error);
+    if (!session || !_user) {
+        return jsonResponse({
+            success: false,
+            message: "Not authenticated",
+            status: 401,
+        });
+    }
 
-        return Response.json(
+    try {
+        const dietPlan = await UserDietPlanModel.aggregate([
             {
-                success: false,
-                message: "Error while updating the user membership",
+                $match: {
+                    clientId: new mongoose.Types.ObjectId(_user._id),
+                },
             },
             {
-                status: 500,
-            }
-        );
+                $project: {
+                    _id: 1,
+                    clientId: 1,
+                    planName: 1,
+                    meals: 1,
+                    notes: 1,
+                },
+            },
+        ]);
+
+        if (!dietPlan) {
+            return jsonResponse({
+                success: true,
+                message:
+                    "Diet plan not available yet. Please check back later.",
+                status: 200,
+                data: null,
+            });
+        }
+
+        return jsonResponse({
+            success: true,
+            message: "The diet plan fetched successfully",
+            status: 200,
+            data: dietPlan,
+        });
+    } catch (error) {
+        return errorResponse({
+            error,
+            message: "Error while getting the diet plan",
+            status: 500,
+        });
     }
 }

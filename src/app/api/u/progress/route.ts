@@ -4,8 +4,6 @@ import { authOptions } from "../../auth/[...nextauth]/options";
 import mongoose from "mongoose";
 import UserModel from "@/model/auth/user.model";
 import UserProgressModel from "@/model/userProgress.model";
-import { exit } from "process";
-import { number } from "zod";
 
 export async function GET(request: Request) {
     await dbConnection();

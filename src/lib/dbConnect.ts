@@ -1,22 +1,22 @@
 import mongoose from "mongoose";
 
-type ConnectionConfig = {
+interface ConnectionConfig {
     isConnected?: number;
-};
+}
 
-const connection: ConnectionConfig = {};
+// Use a global variable to persist the connection state across calls
+let globalConnection: ConnectionConfig = globalThis as any;
+globalConnection.isConnected = globalConnection?.isConnected || 0;
 
 async function dbConnect() {
-    if (connection.isConnected) {
+    if (globalConnection.isConnected) {
         console.log("Already connected to database");
         return;
     }
 
     try {
         const db = await mongoose.connect(process.env.MONGODB_URL! || "");
-
-        connection.isConnected = db.connections[0].readyState;
-
+        globalConnection.isConnected = db.connections[0].readyState;
         console.log("DB connected successfully");
     } catch (error: any) {
         console.log("Database connection failed");

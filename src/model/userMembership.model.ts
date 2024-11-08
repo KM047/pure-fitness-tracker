@@ -2,53 +2,64 @@ import mongoose, { Document, model, models, Schema } from "mongoose";
 
 export interface IUserMembership extends Document {
     userId: mongoose.Schema.Types.ObjectId;
-    membershipId: mongoose.Schema.Types.ObjectId;
-    membership_status: boolean;
-    membership_validity: number;
-    membership_start_date?: Date;
-    membership_end_date?: Date;
+    monthlyPlanId: mongoose.Schema.Types.ObjectId;
+    membershipStatus: boolean;
+    membershipValidity: number;
+    membershipStartDate?: Date;
+    membershipEndDate?: Date;
+    feePaid: number;
+    actualFee?: number;
+    feeStatus?: "UNPAID" | "HALF" | "PAID";
 }
 
 const userMembershipSchema: Schema<IUserMembership> =
-    new Schema<IUserMembership>({
-        userId: {
-            type: Schema.Types.ObjectId,
-            ref: "User",
+    new Schema<IUserMembership>(
+        {
+            userId: {
+                type: Schema.Types.ObjectId,
+                ref: "User",
+            },
+            monthlyPlanId: {
+                // this is the id of the membership plan
+                type: Schema.Types.ObjectId,
+                ref: "MonthsPlan",
+            },
+            membershipStatus: {
+                type: Boolean,
+                required: true,
+                default: false,
+            },
+            membershipValidity: {
+                type: Number,
+                required: true,
+            },
+            membershipStartDate: {
+                type: Date,
+                required: true,
+            },
+            membershipEndDate: {
+                type: Date,
+                required: true,
+            },
+            feePaid: {
+                // this amount where user paid to admin
+                type: Number,
+                default: 0,
+            },
+            actualFee: {
+                type: Number,
+                default: 0,
+            },
+            feeStatus: {
+                type: String,
+                enum: ["UNPAID", "HALF", "PAID"],
+                default: "UNPAID",
+            },
         },
-        membershipId: {
-            type: Schema.Types.ObjectId,
-            ref: "Membership",
-        },
-        membership_status: {
-            type: Boolean,
-            required: true,
-        },
-        membership_validity: {
-            type: Number,
-            required: true,
-        },
-        membership_start_date: {
-            type: Date,
-            required: true,
-        },
-        membership_end_date: {
-            type: Date,
-            required: true,
-        },
-    });
-
-// this pre middleware will set the membership_end_date based on membership_validity
-userMembershipSchema.pre("save", function (next: any) {
-    // Only set dates if this is a new document or the membershipId has changed
-    if (this.isNew || this.isModified("membershipId")) {
-        if (this.membership_start_date && this.membership_validity) {
-            const startDate = new Date(this.membership_start_date);
-            startDate.setMonth(startDate.getMonth() + this.membership_validity);
-            this.membership_end_date = startDate;
+        {
+            timestamps: true,
         }
-    }
-    next();
-});
+    );
 
 const UserMembershipModel =
     models.UserMembership ||

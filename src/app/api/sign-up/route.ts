@@ -3,6 +3,7 @@ import UserModel from "@/model/auth/user.model";
 import bcrypt from "bcryptjs";
 
 import { sendVerificationEmail } from "@/helpers/sendVerificationEmail";
+import { errorResponse } from "@/helpers/responseUtils";
 
 export async function POST(request: Request) {
     await dbConnection();
@@ -106,16 +107,10 @@ export async function POST(request: Request) {
             }
         );
     } catch (error) {
-        console.log("Error while registering user", error);
-
-        return Response.json(
-            {
-                success: false,
-                message: "Error while registering user",
-            },
-            {
-                status: 500,
-            }
-        );
+        return errorResponse({
+            error,
+            message: "Error while registering user",
+            status: 500,
+        });
     }
 }

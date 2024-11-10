@@ -10,7 +10,7 @@ globalConnection.isConnected = globalConnection?.isConnected || 0;
 
 async function dbConnect() {
     if (globalConnection.isConnected) {
-        console.log("Already connected to database");
+        // console.log("Already connected to database");
         return;
     }
 

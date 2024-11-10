@@ -30,8 +30,6 @@ export const authOptions: NextAuthOptions = {
                         ],
                     });
 
-                    // console.log("user with credentials -> ", user);
-
                     if (!user) {
                         throw new Error("No user found with this email");
                     }
@@ -48,14 +46,11 @@ export const authOptions: NextAuthOptions = {
                     );
 
                     if (isPasswordCorrect) {
-                        // console.log("password is correct ");
-
                         return user;
                     } else {
                         throw new Error("Invalid password");
                     }
                 } catch (error: any) {
-                    // console.log("error -> ", error);
                     throw new Error(error);
                 }
             },
@@ -77,20 +72,12 @@ export const authOptions: NextAuthOptions = {
                         email: user.email,
                     });
 
-                    // console.log("User -> ", user);
-                    // console.log("account -> ", account);
-                    // console.log("Profile -> ", profile);
-                    // console.log("existingUser -> ", existingUser);
-
                     if (existingUser) {
                         if (existingUser.googleId) {
                             user.id = existingUser._id?.toString() as string;
 
                             return user; // Sign in successful
                         }
-                        // existingUser.googleId = user.id; // Link Google ID
-                        // await existingUser.save();
-                        // return user; // Sign in successful
                     }
                     const newUser = new UserModel({
                         name: user.name,
@@ -106,7 +93,7 @@ export const authOptions: NextAuthOptions = {
                     user._id = newUser._id?.toString();
                     return user; // Sign in successful
                 } catch (error) {
-                    console.log(error);
+                    throw new Error(error as string, { cause: error });
                 }
             } else if (account?.provider === "credentials") {
                 // Allow sign-in for credentials if authorize() succeeded
@@ -115,8 +102,6 @@ export const authOptions: NextAuthOptions = {
         },
 
         async jwt({ token, user }) {
-            // console.log("user", user);
-
             if (user) {
                 token._id = user._id;
                 token.isVerified = user.isVerified;
@@ -124,12 +109,9 @@ export const authOptions: NextAuthOptions = {
                 token.role = user.role;
             }
 
-            // console.log("token -> ", token);
-
             return token;
         },
         async session({ session, token }) {
-            // console.log("user", token);
             if (token) {
                 session.user._id = token._id || token?.sub;
                 session.user.isVerified = token.isVerified;

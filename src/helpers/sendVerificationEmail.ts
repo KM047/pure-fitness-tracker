@@ -21,7 +21,7 @@ export async function sendVerificationEmail(
             statusCode: 200,
         };
     } catch (emailError) {
-        console.log("Error sending verification email", emailError);
+        // console.log("Error sending verification email", emailError);
 
         return { success: false, message: "Failed to send verification email" };
     }

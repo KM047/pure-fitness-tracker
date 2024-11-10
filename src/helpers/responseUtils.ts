@@ -32,7 +32,7 @@ export const errorResponse = ({
     message = "An error occurred",
     status = 200,
 }: {
-    error: unknown;
+    error?: unknown;
     message?: string;
     status?: number;
 }) => {

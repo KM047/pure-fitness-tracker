@@ -4,6 +4,7 @@ import { authOptions } from "../../auth/[...nextauth]/options";
 import mongoose from "mongoose";
 import UserModel from "@/model/auth/user.model";
 import UserProgressModel from "@/model/userProgress.model";
+import { errorResponse, jsonResponse } from "@/helpers/responseUtils";
 
 export async function GET(request: Request) {
     await dbConnection();
@@ -12,18 +13,12 @@ export async function GET(request: Request) {
 
     const _user: User = session?.user as User;
 
-    // console.log("_user -> ", _user);
-
     if (!session || !_user) {
-        return Response.json(
-            {
-                success: false,
-                message: "Not authenticated",
-            },
-            {
-                status: 401,
-            }
-        );
+        return errorResponse({
+            error: "Not authenticated",
+            message: "Not authenticated",
+            status: 401,
+        });
     }
 
     const userId = new mongoose.Types.ObjectId(_user._id);
@@ -117,15 +112,11 @@ export async function GET(request: Request) {
             status: 200,
         });
     } catch (error) {
-        return Response.json(
-            {
-                success: false,
-                message: "Error while getting the progress of user" + error,
-            },
-            {
-                status: 500,
-            }
-        );
+        return errorResponse({
+            error: "Error while getting the progress of user",
+            message: "Error while getting the progress of user" + error,
+            status: 500,
+        });
     }
 }
 
@@ -137,15 +128,11 @@ export async function POST(request: Request) {
     const _user: User = session?.user as User;
 
     if (!session || !_user) {
-        return Response.json(
-            {
-                success: false,
-                message: "Not authenticated",
-            },
-            {
-                status: 401,
-            }
-        );
+        return errorResponse({
+            error: "Not authenticated",
+            message: "Not authenticated",
+            status: 401,
+        });
     }
 
     const userId = new mongoose.Types.ObjectId(_user._id);
@@ -177,26 +164,16 @@ export async function POST(request: Request) {
             await newUserProgress.save();
         }
 
-        return Response.json(
-            {
-                success: true,
-                message: "User progress added successfully",
-            },
-            {
-                status: 200,
-            }
-        );
+        return jsonResponse({
+            success: true,
+            message: "User progress added successfully",
+            status: 200,
+        });
     } catch (error) {
-        console.log("Error while registering user", error);
-
-        return Response.json(
-            {
-                success: false,
-                message: "Error while updating the progress of user",
-            },
-            {
-                status: 500,
-            }
-        );
+        return errorResponse({
+            error,
+            message: "Error while updating the progress of user",
+            status: 500,
+        });
     }
 }

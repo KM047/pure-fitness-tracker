@@ -182,7 +182,6 @@ export async function POST(request: NextRequest) {
             data: newPlan,
         });
     } catch (error) {
-        // console.log("Error while creating the new plan", error);
 
         return errorResponse({
             error,

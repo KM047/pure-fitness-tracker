@@ -47,10 +47,8 @@ const SignInPage = () => {
             password: data.password,
         });
 
-        // console.log(result);
         setIsSubmitting(false);
 
-        // console.log(result);
         if (result?.error) {
             if (result.error == "CredentialsSignInError") {
                 toast({

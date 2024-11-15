@@ -66,7 +66,7 @@ const SignInPage = () => {
         }
 
         if (result?.url) {
-            router.replace("/dashboard");
+            router.replace("/");
         }
     };
 

@@ -26,8 +26,12 @@ export async function middleware(request: NextRequest) {
             url.pathname.startsWith("/verify") ||
             url.pathname === "/")
     ) {
-
-        return NextResponse.redirect(new URL("/dashboard", request.url));
+        return NextResponse.redirect(
+            new URL(
+                token.role === "ADMIN" ? "/dashboard/a" : "/dashboard/u",
+                request.url
+            )
+        );
     }
 
     if (!token && url.pathname.startsWith("/dashboard")) {

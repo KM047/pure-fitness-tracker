@@ -15,6 +15,11 @@ import {
     SidebarProvider,
     SidebarTrigger,
 } from "@/components/ui/sidebar";
+
+import { SWRConfig } from 'swr'
+
+import "./../../../globals.css";
+
 interface RootLayoutProps {
     children: React.ReactNode;
 }
@@ -30,7 +35,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
                             orientation="vertical"
                             className="mr-2 h-4"
                         />
-                        <Breadcrumb>
+                        {/* <Breadcrumb>
                             <BreadcrumbList>
                                 <BreadcrumbItem className="hidden md:block">
                                     <BreadcrumbLink href="#">
@@ -44,9 +49,18 @@ export default function RootLayout({ children }: RootLayoutProps) {
                                     </BreadcrumbPage>
                                 </BreadcrumbItem>
                             </BreadcrumbList>
-                        </Breadcrumb>
+                        </Breadcrumb> */}
                     </header>
-                    {children}
+
+                    <SWRConfig
+                        value={{
+                            refreshInterval: 3000,
+                            fetcher: (resource, init) => fetch(resource, init).then(res => res.json())
+                        }}
+
+                    >
+                        {children}
+                    </SWRConfig>
                 </SidebarInset>
             </SidebarProvider>
         </>

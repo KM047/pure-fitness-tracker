@@ -49,88 +49,6 @@ export async function GET(request: NextRequest) {
 
         const skip = (currentPage - 1) * pageSize;
 
-        // const pipeline = [
-        //     // Step 1: Lookup to populate user details from User collection
-        //     {
-        //         $lookup: {
-        //             from: "users", // The collection to join (Users)
-        //             localField: "userId", // Field from the current collection
-        //             foreignField: "_id", // Field from Users collection
-        //             as: "userInfo", // Output array field for user information
-        //         },
-        //     },
-
-        //     // Step 2: Unwind userInfo array to make each user info a separate document
-        //     {
-        //         $unwind: {
-        //             path: "$userInfo",
-        //             preserveNullAndEmptyArrays: true,
-        //         },
-        //     },
-
-        //     // Step 3: Lookup to populate membership details from Membership collection
-        //     {
-        //         $lookup: {
-        //             from: "memberships", // The collection to join (Memberships)
-        //             localField: "membershipId", // Field from the current collection
-        //             foreignField: "_id", // Field from Memberships collection
-        //             as: "membershipInfo", // Output array field for membership information
-        //         },
-        //     },
-
-        //     // Step 4: Unwind membershipInfo array to make each membership info a separate document
-        //     {
-        //         $unwind: {
-        //             path: "$membershipInfo",
-        //             preserveNullAndEmptyArrays: true,
-        //         },
-        //     },
-
-        //     // Step 5: Add a computed field for membership validity
-        //     {
-        //         $addFields: {
-        //             isMembershipValid: {
-        //                 $cond: {
-        //                     if: {
-        //                         $and: [
-        //                             { $eq: ["$membershipStatus", true] }, // Membership status must be true
-        //                             {
-        //                                 $gte: [
-        //                                     "$membershipEndDate",
-        //                                     new Date(),
-        //                                 ],
-        //                             }, // endDate >= today
-        //                             {
-        //                                 $lte: [
-        //                                     "$membershipStartDate",
-        //                                     new Date(),
-        //                                 ],
-        //                             }, // startDate <= today
-        //                         ],
-        //                     },
-        //                     then: true,
-        //                     else: false,
-        //                 },
-        //             },
-        //         },
-        //     },
-
-        //     {
-        //         $project: {
-        //             "userInfo.name": 1,
-        //             "userInfo.email": 1,
-        //             membershipStatus: 1,
-        //             membershipValidity: 1,
-        //             membershipStartDate: 1,
-        //             membershipEndDate: 1,
-        //             isMembershipValid: 1,
-        //             feePaid: 1,
-        //             actualFee: 1,
-        //             feeStatus: 1,
-        //         },
-        //     },
-        // ];
-
         const pipeline = [
             // Step 1: Lookup to populate user details from User collection
             {
@@ -249,7 +167,69 @@ export async function GET(request: NextRequest) {
                 },
             },
         ];
-        const membership = await UserMembershipModel.aggregate(pipeline);
+
+        const registrationPipeline = [
+            {
+                $match: {
+                    membershipStartDate: {
+                        $gte: new Date(
+                            new Date().setMonth(new Date().getMonth() - 6)
+                        ),
+                    },
+                },
+            },
+            {
+                $group: {
+                    _id: {
+                        year: { $year: "$membershipStartDate" },
+                        month: { $month: "$membershipStartDate" },
+                    },
+                    count: { $sum: 1 },
+                },
+            },
+            {
+                $addFields: {
+                    monthName: {
+                        $arrayElemAt: [
+                            [
+                                "",
+                                "January",
+                                "February",
+                                "March",
+                                "April",
+                                "May",
+                                "June",
+                                "July",
+                                "August",
+                                "September",
+                                "October",
+                                "November",
+                                "December",
+                            ],
+                            "$_id.month",
+                        ],
+                    },
+                },
+            },
+            {
+                $sort: { "_id.year": 1, "_id.month": 1 },
+            },
+            {
+                $project: {
+                    monthName: 1,
+                    year: "$_id.year",
+                    count: 1,
+                    _id: 0,
+                },
+            },
+        ];
+
+        // const membership = await UserMembershipModel.aggregate(pipeline);
+
+        const [membership, registration] = await Promise.all([
+            UserMembershipModel.aggregate(pipeline),
+            UserMembershipModel.aggregate(registrationPipeline),
+        ]);
 
         if (membership.length == 0) {
             return jsonResponse({
@@ -262,7 +242,7 @@ export async function GET(request: NextRequest) {
         return jsonResponse({
             success: true,
             message: "The membership plans fetched successfully",
-            data: membership,
+            data: { membership, registration },
         });
     } catch (error) {
         return errorResponse({

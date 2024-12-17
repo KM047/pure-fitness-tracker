@@ -3,11 +3,11 @@ const adminData = {
     navMain: [
         {
             title: "Dashboard",
-            url: "#",
+            url: "/dashboard/a/",
             items: [
                 {
                     title: "Overview",
-                    url: "#",
+                    url: "/dashboard/a/",
                 },
                 {
                     title: "Analytics",
@@ -21,7 +21,7 @@ const adminData = {
             items: [
                 {
                     title: "Client List",
-                    url: "#",
+                    url: "/dashboard/a/clients",
                 },
                 {
                     title: "Progress Tracking",
@@ -35,6 +35,10 @@ const adminData = {
                 {
                     title: "Workout Plans",
                     url: "#",
+                },
+                {
+                    title: "Memberships",
+                    url: "/dashboard/a/memberships",
                 },
                 {
                     title: "Communication",

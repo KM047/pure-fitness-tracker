@@ -75,7 +75,7 @@ export default function AdminPage() {
                     <div className="rounded-xl border bg-card text-card-foreground shadow col-span-4">
                         <div className="flex flex-col space-y-1.5 p-6">
                             <div className="font-semibold leading-none tracking-tight">
-                                Recent Sales
+                                Recent Members
                             </div>
                             <div className="text-sm text-muted-foreground">
                                 You made 265 sales this month.

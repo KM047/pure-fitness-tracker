@@ -30,7 +30,7 @@ const adminData = {
                 },
                 {
                     title: "Diet Plans",
-                    url: "#",
+                    url: "/dashboard/a/diet",
                 },
                 {
                     title: "Workout Plans",

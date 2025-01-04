@@ -36,10 +36,10 @@ export default function DemoPage() {
 
     // Log for debugging
     if (error) {
-        console.log(`Error fetching data: ${error.message}`);
+     // console.log(`Error fetching data: ${error.message}`);
     }
 
-    console.log("Fetched userDataNew:", userDataNew);
+ // console.log("Fetched userDataNew:", userDataNew);
 
     return (
         <div className="container mx-auto py-12">
@@ -66,20 +66,23 @@ export default function DemoPage() {
             </div>
 
             {/* Data Table */}
-            <div className="p-4">
+            <div className="p-4 w-80 sm:w-full overflow-hidden shadow-sm">
                 {isLoading ? (
                     <div className="max-w-screen-sm text-center h-80 flex justify-center items-center">
                         <Loader />
                     </div>
                 ) : error ? (
-                    <div>Error loading data!</div>
+                    <div className="text-red-500 font-medium text-center">
+                        Error loading data!
+                    </div>
                 ) : (
-                    <div>
+                    <div className="overflow-x-auto">
                         <h2 className="text-xl font-bold mb-4">User Membership Data</h2>
                         <DataTable columns={membersColumn} data={userDataNew} />
                     </div>
                 )}
             </div>
         </div>
+
     );
 }

@@ -16,7 +16,7 @@ const broadcast = (data: any) => {
 };
 
 wss.on("connection", async (ws: any) => {
-    console.log("New client connected");
+    // console.log("New client connected");
 
     // Connect to MongoDB and fetch membership data
     await dbConnect();
@@ -53,7 +53,7 @@ wss.on("connection", async (ws: any) => {
     });
 
     ws.on("close", () => {
-        console.log("Client disconnected");
+        // console.log("Client disconnected");
     });
 });
 

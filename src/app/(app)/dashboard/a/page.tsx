@@ -67,7 +67,7 @@ export default function AdminPage() {
                     </div>
                 </div>
             </div>
-            <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min">
+            <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min sm:w-full overflow-hidden">
                 <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-8">
                     <div className="rounded-xl border bg-card text-card-foreground shadow col-span-4">
                         <ChartComponent />
@@ -80,8 +80,13 @@ export default function AdminPage() {
                             <div className="text-sm text-muted-foreground">
                                 You made 265 sales this month.
                             </div>
+                            <div className="p-4 w-80 sm:w-full overflow-hidden shadow-sm">
 
-                            <RecentMembers />
+                                <div className="overflow-x-auto">
+
+                                    <RecentMembers />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

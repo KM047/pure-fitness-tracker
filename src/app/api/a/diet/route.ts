@@ -130,7 +130,7 @@ export async function PUT(request: NextRequest) {
             );
         }
 
-        const { templateId, templateName, meals, weeklySchedule, notes, type } =
+        const { templateId, templateName, type, meals, notes } =
             await request.json();
 
         const existedDietPlanTemplate =
@@ -140,7 +140,6 @@ export async function PUT(request: NextRequest) {
                     templateName,
                     type,
                     meals,
-                    weeklySchedule,
                     notes,
                 },
                 {

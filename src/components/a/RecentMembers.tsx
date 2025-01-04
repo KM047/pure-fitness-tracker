@@ -10,7 +10,8 @@ import {
 } from "@/components/ui/table";
 import { useState, useEffect } from "react";
 import axiosInstance from "@/helpers/axiosInstance";
-import { formatDate, getStatusClass } from "@/helpers";
+import { fetcher, formatDate, getStatusClass } from "@/helpers";
+import useSWR from "swr";
 
 
 
@@ -21,22 +22,15 @@ export function RecentMembers() {
     const [members, setMembers] = useState([]);
     const [total, setTotal] = useState(0);
 
+    const { data, error, isLoading } = useSWR("a/membership", fetcher, {
+        revalidateOnFocus: false,
+    });
+
     useEffect(() => {
-        const fetchMembers = async () => {
-            const response = await axiosInstance.get("a/membership");
-
-            if (response.data.data.membership[0].paginatedData.length === 0) {
-                setMembers([]);
-            }
-
-            if (response) {
-                setMembers(response.data.data.membership[0].paginatedData);
-            }
+        if (data && data.data && data.data.membership) {
+            setMembers(data.data.membership[0].paginatedData);
         }
-
-        fetchMembers();
-
-    }, [])
+    }, [data])
 
 
 
@@ -45,12 +39,6 @@ export function RecentMembers() {
         const totalFee = members.reduce((sum: number, mem: any) => sum + Number(mem.feePaid), 0);
         setTotal(totalFee);
     }, [members])
-
-
-
-
-
-
 
     return (
         <Table>

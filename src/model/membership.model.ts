@@ -32,6 +32,7 @@ const membershipSchema: Schema<IMembership> = new Schema<IMembership>(
 
         membershipImage: {
             type: String,
+            default: "https://placehold.co/600x400",
         },
     },
     {

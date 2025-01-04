@@ -59,7 +59,7 @@ export default function SignUpForm() {
                     const axiosError = error as AxiosError<ApiResponse>;
                     setUsernameMessage(
                         axiosError.response?.data.message ??
-                            "Error checking username"
+                        "Error checking username"
                     );
                 } finally {
                     setIsCheckingUsername(false);
@@ -150,12 +150,11 @@ export default function SignUpForm() {
                                     )}
                                     {!isCheckingUsername && usernameMessage && (
                                         <p
-                                            className={`text-sm ${
-                                                usernameMessage ===
+                                            className={`text-sm ${usernameMessage ===
                                                 "Username is available"
-                                                    ? "text-green-500"
-                                                    : "text-red-500"
-                                            }`}
+                                                ? "text-green-500"
+                                                : "text-red-500"
+                                                }`}
                                         >
                                             {usernameMessage}
                                         </p>

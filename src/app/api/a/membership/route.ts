@@ -228,6 +228,7 @@ export async function GET(request: NextRequest) {
 
         const [membership, registration] = await Promise.all([
             UserMembershipModel.aggregate(pipeline),
+            // @ts-ignore
             UserMembershipModel.aggregate(registrationPipeline),
         ]);
 

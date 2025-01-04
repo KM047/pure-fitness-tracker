@@ -1,3 +1,5 @@
+import axiosInstance from "./axiosInstance";
+
 export function formatDate(isoDate: any) {
     const date = new Date(isoDate);
     return `${date.getDate().toString().padStart(2, "0")}/${(
@@ -19,3 +21,6 @@ export const getStatusClass = (status: any) => {
             return "";
     }
 };
+
+export const fetcher = (url: string) =>
+    axiosInstance.get(url).then((res) => res.data);

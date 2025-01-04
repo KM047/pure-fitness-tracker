@@ -1,7 +1,7 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, MoreHorizontal, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -13,7 +13,24 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+
 import { Checkbox } from "@/components/ui/checkbox";
+
+import { deleteDiet } from "@/helpers/ApiCallHelper";
+import { DietView } from "./a/DietView";
+import EditDietPlanDialog from "./a/EditDietPlanDialog";
 
 export type Payment = {
     id: string;
@@ -245,6 +262,110 @@ export const membersColumn: ColumnDef<MembershipData>[] = [
                         <DropdownMenuItem>Contact User</DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
+            );
+        },
+    },
+];
+
+
+export interface DietPlanData {
+    _id: string;
+    templateName: string;
+    type: string;
+    notes: string;
+    meals: any;
+}
+
+export const dietPlanColumns: ColumnDef<DietPlanData>[] = [
+    {
+        id: "Sr No",
+        header: "Sr. No.",
+        cell: ({ row }) => row.index + 1,
+        enableSorting: false,
+        enableHiding: false,
+    },
+    {
+        accessorKey: "templateName",
+        id: "Template Name",
+        header: "Diet Plan Name",
+        cell: ({ row }) => {
+            const name = row.original.templateName;
+            return <div>{name}</div>;
+        },
+    },
+
+    {
+        accessorKey: "templateType",
+        header: "Diet Plan Type",
+        cell: ({ row }) => {
+
+            const type = row.original.type;
+            return <div>{type}</div>;
+        },
+    },
+    {
+        id: "actions",
+        cell: ({ row }) => {
+            const dietPlan = row.original;
+
+            return (
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+
+                        <DietView dietPlan={dietPlan} />
+                        <DropdownMenuSeparator />
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            );
+        },
+    },
+
+    {
+        id: "edit",
+        header: "Edit Diet",
+        cell: ({ row }) => {
+            const dietPlan = row.original;
+
+            return (
+                <>
+                    <EditDietPlanDialog diet={dietPlan} />
+                </>
+            );
+        },
+    },
+
+    {
+        id: "delete",
+        cell: ({ row }) => {
+            const dietId = row.original._id;
+
+            return (
+                <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                        <Button variant="outline" className='text-red-500 hover:text-red-700'>
+                            <Trash2 className="mr-2 h-4 w-4" /> Delete
+                        </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                Do you really want to delete this membership?
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => deleteDiet(dietId)}>Continue</AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
             );
         },
     },

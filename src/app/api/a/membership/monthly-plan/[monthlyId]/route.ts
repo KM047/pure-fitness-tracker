@@ -3,12 +3,15 @@ import { getServerSession, User } from "next-auth";
 
 import { errorResponse, jsonResponse } from "@/helpers/responseUtils";
 import { NextRequest } from "next/server";
-import { authOptions } from "../../../auth/[...nextauth]/options";
+import { authOptions } from "../../../../auth/[...nextauth]/options";
 import MonthlyMembershipModel from "@/model/monthlyMembership.model";
 
 // this route is accepted user membership by admin only
 
-export async function PUT(request: NextRequest) {
+export async function PUT(
+    request: NextRequest,
+    { params }: { params: { monthlyId: string } }
+) {
     await dbConnect();
 
     try {
@@ -33,8 +36,9 @@ export async function PUT(request: NextRequest) {
             });
         }
 
-        const { monthlyPlanId, duration, price, currentOffer } =
-            await request.json();
+        const { duration, price, currentOffer } = await request.json();
+
+        const monthlyPlanId = params.monthlyId;
 
         const existingMonthlyMembershipPlan =
             await MonthlyMembershipModel.findByIdAndUpdate(
@@ -65,6 +69,37 @@ export async function PUT(request: NextRequest) {
         return errorResponse({
             error,
             message: "Error while updating the monthly membership plan",
+            status: 500,
+        });
+    }
+}
+
+export async function DELETE(
+    req: NextRequest,
+    { params }: { params: { monthlyId: string } }
+) {
+    await dbConnect();
+
+    try {
+        const deletedMonthlyMembershipPlan =
+            await MonthlyMembershipModel.findByIdAndDelete(params.monthlyId);
+
+        if (!deletedMonthlyMembershipPlan) {
+            return errorResponse({
+                error: "Monthly membership plan not found",
+                message: "Plan not found",
+                status: 404,
+            });
+        }
+
+        return jsonResponse({
+            success: true,
+            message: "Monthly membership plan deleted successfully",
+        });
+    } catch (error) {
+        return errorResponse({
+            error,
+            message: "Error while deleting the monthly membership plan",
             status: 500,
         });
     }

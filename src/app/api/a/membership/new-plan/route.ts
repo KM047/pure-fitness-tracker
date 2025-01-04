@@ -48,33 +48,25 @@ export async function POST(request: NextRequest) {
 
         const formData = await request.formData();
 
-        const name = formData.get("name") as string;
-        const description = formData.get("description") as string;
+        // console.log("formData : ", formData);
 
-        let perks = ["No perks"];
+        const membershipName = formData.get("membershipName") as string;
+        const membershipDescription = formData.get(
+            "membershipDescription"
+        ) as string;
+        let memePerks = formData.get("membershipPerks") as any;
 
-        // TODO: we need to extract the perks from the form data and also the plan details
+        memePerks = memePerks.split(",").map((perk: any) => perk.trim());
 
-        let planDets = [
-            {
-                duration: 3,
-                price: 12000,
-                currentOffer: 10000,
-            },
-            {
-                duration: 6,
-                price: 22000,
-                currentOffer: 18000,
-            },
-            {
-                duration: 12,
-                price: 40000,
+        let plans = JSON.parse(formData.get("plans") as string);
 
-                currentOffer: 35000,
-            },
-        ];
+        plans = plans.map((plan: any) => ({
+            duration: parseInt(plan.duration, 10),
+            price: parseInt(plan.price, 10),
+            currentOffer: parseInt(plan.currentOffer, 10),
+        }));
 
-        // insert the name in the planDets
+        // console.log("plans : ", plans);
 
         if (
             !process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ||
@@ -90,14 +82,6 @@ export async function POST(request: NextRequest) {
         }
 
         const file = formData.get("file") as File;
-
-        // if (!file) {
-        //     return NextResponse.json({
-        //         success: false,
-        //         message: "File not found",
-        //         status: 400,
-        //     });
-        // }
 
         let result;
 
@@ -137,10 +121,10 @@ export async function POST(request: NextRequest) {
         }
 
         const newPlan = await MembershipModel.create({
-            membershipName: name,
-            membershipDescription: description,
+            membershipName: membershipName,
+            membershipDescription: membershipDescription,
             membershipImage: result?.url,
-            membershipPerks: perks,
+            membershipPerks: memePerks,
         });
 
         if (!newPlan) {
@@ -152,17 +136,17 @@ export async function POST(request: NextRequest) {
         }
 
         // we need to add the name in the planDets for easy to find the plan name
-        planDets = planDets.map((plan) => {
+        plans = plans.map((plan: any) => {
             return {
                 ...plan,
-                name,
+                name: membershipName,
                 membershipId: new mongoose.Types.ObjectId(
                     newPlan._id as string
                 ),
             };
         });
 
-        const monthlyPlan = await MonthlyMembershipModel.insertMany(planDets);
+        const monthlyPlan = await MonthlyMembershipModel.insertMany(plans);
 
         if (!monthlyPlan) {
             return NextResponse.json({
@@ -172,8 +156,6 @@ export async function POST(request: NextRequest) {
                 status: 500,
             });
         }
-
-        // newPlan.plans = monthlyPlan;
 
         return jsonResponse({
             success: true,

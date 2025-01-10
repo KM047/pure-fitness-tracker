@@ -22,5 +22,8 @@ export const getStatusClass = (status: any) => {
     }
 };
 
-export const fetcher = (url: string) =>
+export const fetcherForGet = (url: string) =>
     axiosInstance.get(url).then((res) => res.data);
+
+export const fetcherForPost = (url: string, data: any) =>
+    axiosInstance.post(url, data).then((res) => res.data);

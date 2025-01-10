@@ -160,7 +160,7 @@ export const membersColumn: ColumnDef<MembershipData>[] = [
         enableHiding: false,
     },
     {
-        accessorKey: "userInfo.name",
+        accessorKey: "User name",
         header: "Name",
         cell: ({ row }) => {
             const name = row.original.userInfo.name;

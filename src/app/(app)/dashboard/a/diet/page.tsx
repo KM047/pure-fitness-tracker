@@ -4,16 +4,20 @@ import { NewDietsEdits } from "@/components/a/NewDietsEdits";
 import { dietPlanColumns } from "@/components/columns";
 import { DataTable } from "@/components/data-table";
 import Loader from "@/components/Loader"
-import { fetcher } from "@/helpers"
+import { fetcherForGet } from "@/helpers"
 import { useEffect, useState } from "react";
 import useSWR from "swr"
 
 
 export default function Diet() {
 
+
+    const [currentPage, setCurrentPage] = useState(1)
+
+
     const { data, error, isLoading } = useSWR(
         "a/diet",
-        fetcher,
+        fetcherForGet,
         { revalidateOnFocus: false }
     )
 
@@ -35,7 +39,13 @@ export default function Diet() {
                     <div className="overflow-x-auto">
                         <h2 className="text-xl font-bold mb-4">Diet Template </h2>
                         <NewDietsEdits />
-                        <DataTable columns={dietPlanColumns} data={data.data} filterColumn={"Template Name"} />
+                        <DataTable columns={dietPlanColumns} data={data.data} filterColumn={"Template Name"} props={
+                            {
+                                currentPage,
+                                setCurrentPage
+                            }
+                        }
+                        />
                     </div>
                 )}
             </div>

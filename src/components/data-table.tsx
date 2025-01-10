@@ -38,12 +38,14 @@ interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
     data: TData[];
     filterColumn?: string;
+    props?: any
 }
 
 export function DataTable<TData, TValue>({
     columns,
     data,
-    filterColumn = "email"
+    filterColumn = "email",
+    props
 }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnFilters, setColumnFilters] =
@@ -201,16 +203,16 @@ export function DataTable<TData, TValue>({
                     <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => table.previousPage()}
-                        disabled={!table.getCanPreviousPage()}
+                        onClick={() => props.setCurrentPage(props.currentPage - 1)}
+                        disabled={props.currentPage <= 1}
                     >
                         Previous
                     </Button>
                     <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => table.nextPage()}
-                        disabled={!table.getCanNextPage()}
+                        onClick={() => props.setCurrentPage(props.currentPage + 1)}
+                        // disabled={props.currentPage <= 0}
                     >
                         Next
                     </Button>

@@ -3,11 +3,13 @@
 import { membersColumn } from "@/components/columns";
 import { DataTable } from "@/components/data-table";
 import Loader from "@/components/Loader";
+import { fetcherForGet, fetcherForPost } from "@/helpers";
 import axiosInstance from "@/helpers/axiosInstance";
+import { toast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
 import useSWR from "swr";
 
-const fetcher = (url: string) => axiosInstance.get(url).then((res) => res.data);
+// const fetcher = (url: string) => axiosInstance.get(url).then((res) => res.data);
 
 export default function DemoPage() {
     const [userDataNew, setUserDataNew] = useState<any[]>([]);
@@ -20,10 +22,15 @@ export default function DemoPage() {
         // { label: "Inactive Members", value: "270" },
     ];
 
+    const [currentPage, setCurrentPage] = useState(1)
+
     // Fetch data using SWR
-    const { data, error, isLoading } = useSWR("a/membership", fetcher, {
-        revalidateOnFocus: false,
+    const { data, error, isLoading } = useSWR(`a/membership/p/${currentPage}`, fetcherForGet, {
+        revalidateOnFocus: true,
     });
+
+    // console.log("Data -> ", data)
+
 
     // Update state when data changes
     useEffect(() => {
@@ -36,10 +43,13 @@ export default function DemoPage() {
 
     // Log for debugging
     if (error) {
-     // console.log(`Error fetching data: ${error.message}`);
+        // console.log(`Error fetching data: ${error.message}`);
+        toast({
+            title: "Membership Data",
+            description: error
+        });
     }
 
- // console.log("Fetched userDataNew:", userDataNew);
 
     return (
         <div className="container mx-auto py-12">
@@ -78,7 +88,12 @@ export default function DemoPage() {
                 ) : (
                     <div className="overflow-x-auto">
                         <h2 className="text-xl font-bold mb-4">User Membership Data</h2>
-                        <DataTable columns={membersColumn} data={userDataNew} />
+                        <DataTable columns={membersColumn} data={userDataNew} props={
+                            {
+                                currentPage,
+                                setCurrentPage
+                            }
+                        } />
                     </div>
                 )}
             </div>

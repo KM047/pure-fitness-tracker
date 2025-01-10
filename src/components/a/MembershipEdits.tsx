@@ -155,7 +155,7 @@ export function MembershipEdits({ plan }: { plan: any }) {
                                         <Textarea
                                             id="membershipPerks"
                                             {...field}
-                                            placeholder="Enter the plan offer"
+                                            placeholder="Enter the plan offer separated by comma"
                                             className="col-span-2 h-8"
                                         />
                                         <FormMessage />

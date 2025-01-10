@@ -1,6 +1,6 @@
 import dbConnect from "@/lib/dbConnect";
 import { getServerSession, User } from "next-auth";
-import { authOptions } from "../../auth/[...nextauth]/options";
+import { authOptions } from "../../../../auth/[...nextauth]/options";
 
 import MembershipModel from "@/model/membership.model";
 import UserMembershipModel, {
@@ -11,7 +11,17 @@ import { NextRequest } from "next/server";
 
 // this route only get the details about the subscribed user memberships
 
-export async function GET(request: NextRequest) {
+export async function GET(
+    req: NextRequest,
+    {
+        params,
+    }: {
+        params: {
+            currentPage: number;
+            pageSize?: number;
+        };
+    }
+) {
     await dbConnect();
 
     try {
@@ -36,16 +46,9 @@ export async function GET(request: NextRequest) {
             });
         }
 
-        /**
-         * Make the aggregate query that where the it gives the result like user some info and he
-         * has some membership or not its starting date and ending date
-         * the validity of the membership
-         *
-         */
+        let { pageSize = 10, currentPage = 1 } = params;
 
-        // const { pageSize, currentPage } = await request.json();
-        const pageSize = 10;
-        const currentPage = 1;
+        currentPage = currentPage <= 0 ? 1 : currentPage;
 
         const skip = (currentPage - 1) * pageSize;
 
@@ -117,6 +120,7 @@ export async function GET(request: NextRequest) {
                     "userInfo.name": 1,
                     "userInfo.email": 1,
                     membershipStatus: 1,
+                    monthlyPlanId: 1,
                     membershipValidity: 1,
                     membershipStartDate: 1,
                     membershipEndDate: 1,

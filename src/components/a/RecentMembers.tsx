@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { useState, useEffect } from "react";
 import axiosInstance from "@/helpers/axiosInstance";
-import { fetcher, formatDate, getStatusClass } from "@/helpers";
+import { fetcherForGet, formatDate, getStatusClass } from "@/helpers";
 import useSWR from "swr";
 
 
@@ -22,7 +22,8 @@ export function RecentMembers() {
     const [members, setMembers] = useState([]);
     const [total, setTotal] = useState(0);
 
-    const { data, error, isLoading } = useSWR("a/membership", fetcher, {
+
+    const { data, error, isLoading } = useSWR("a/membership/p/1", fetcherForGet, {
         revalidateOnFocus: false,
     });
 

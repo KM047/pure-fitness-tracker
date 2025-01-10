@@ -37,6 +37,7 @@ import { MonthlyMembershipEdits } from '@/components/a/MonthlyMembershipEdits';
 import { toast } from '@/hooks/use-toast';
 import { MembershipEdits } from '@/components/a/MembershipEdits';
 import { NewMembershipEdits } from '@/components/a/NewMembership';
+import { fetcherForGet } from '@/helpers';
 
 async function deleteMembership(membershipId: string) {
 
@@ -255,12 +256,13 @@ export const columns: ColumnDef<any>[] = [
 
 ];
 
-const fetcher = (url: string) => axiosInstance.get(url).then((res) => res.data);
 
 
 export default function MembershipPage() {
 
-    const { data, error, isLoading } = useSWR("membership", fetcher, {
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const { data, error, isLoading } = useSWR("membership", fetcherForGet, {
         revalidateOnFocus: false,
     });
 
@@ -281,7 +283,12 @@ export default function MembershipPage() {
                     <div className="overflow-x-auto">
                         <h2 className="text-xl font-bold mb-4">User Membership Data</h2>
                         <NewMembershipEdits />
-                        <DataTable columns={columns} data={data.data} filterColumn={"Membership Name"} />
+                        <DataTable columns={columns} data={data.data} filterColumn={"Membership Name"} props={
+                            {
+                                currentPage,
+                                setCurrentPage
+                            }
+                        } />
                     </div>
                 )}
             </div>

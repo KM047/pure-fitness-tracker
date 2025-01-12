@@ -29,7 +29,7 @@ const adminData = {
                     isActive: true,
                 },
                 {
-                    title: "Diet Plans",
+                    title: "Diet Plans Templates",
                     url: "/dashboard/a/diet",
                 },
                 {

@@ -119,6 +119,7 @@ export async function GET(
                 $project: {
                     "userInfo.name": 1,
                     "userInfo.email": 1,
+                    "userInfo.phone": 1,
                     membershipStatus: 1,
                     monthlyPlanId: 1,
                     membershipValidity: 1,

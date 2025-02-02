@@ -129,18 +129,6 @@ export function NewDietsEdits() {
         },
     });
 
-    // const form = useForm({
-    //     defaultValues: {
-    //         templateName: template.templateName,
-    //         type: template.type,
-    //         meals: template.meals,
-    //         notes: template.notes
-
-    //     }
-    // })
-
-
-
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const updateMealItem = (mealKey: string, index: number, updatedItem: { foodItem: string; quantity: string; }) => {

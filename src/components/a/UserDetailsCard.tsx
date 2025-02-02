@@ -1,12 +1,10 @@
 import {
     AlertDialog,
-    AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
     AlertDialogFooter,
     AlertDialogHeader,
-    AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
@@ -15,7 +13,7 @@ function UserDetailsCard({ userDets }: any) {
     return (
         <AlertDialog>
             <AlertDialogTrigger asChild>
-                <Button variant="outline">Contact User</Button>
+                <Button variant="outline">User Contact</Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
                 <AlertDialogHeader>

@@ -32,6 +32,7 @@ import { deleteDiet } from "@/helpers/ApiCallHelper";
 import { DietView } from "./a/DietView";
 import EditDietPlanDialog from "./a/EditDietPlanDialog";
 import UserDetailsCard from "./a/UserDetailsCard";
+import AssignDietPlan from './a/AssigningDietToUser';
 
 export type Payment = {
     id: string;
@@ -39,102 +40,6 @@ export type Payment = {
     status: "pending" | "processing" | "success" | "failed";
     email: string;
 };
-
-// export const columns: ColumnDef<Payment>[] = [
-//     {
-//         id: "select",
-//         header: ({ table }) => (
-//             <>
-//                 <Checkbox
-//                     checked={
-//                         table.getIsAllPageRowsSelected() ||
-//                         (table.getIsSomePageRowsSelected() && "indeterminate")
-//                     }
-//                     onCheckedChange={(value) =>
-//                         table.toggleAllPageRowsSelected(!!value)
-//                     }
-//                     aria-label="Select all"
-//                 />
-//                 <span className="pl-3">Select all</span>
-//             </>
-//         ),
-//         cell: ({ row }) => (
-//             <Checkbox
-//                 checked={row.getIsSelected()}
-//                 onCheckedChange={(value) => row.toggleSelected(!!value)}
-//                 aria-label="Select row"
-//             />
-//         ),
-//         enableSorting: false,
-//         enableHiding: false,
-//     },
-//     {
-//         accessorKey: "status",
-//         header: "Status",
-//     },
-//     {
-//         accessorKey: "email",
-//         header: ({ column }) => {
-//             return (
-//                 <Button
-//                     variant="ghost"
-//                     onClick={() =>
-//                         column.toggleSorting(column.getIsSorted() === "asc")
-//                     }
-//                 >
-//                     Email
-//                     <ArrowUpDown className="ml-2 h-4 w-4" />
-//                 </Button>
-//             );
-//         },
-//     },
-//     {
-//         accessorKey: "amount",
-//         header: () => <div className="text-right">Amount</div>,
-//         cell: ({ row }) => {
-//             const amount = parseFloat(row.getValue("amount"));
-//             const formatted = new Intl.NumberFormat("en-US", {
-//                 style: "currency",
-//                 currency: "USD",
-//             }).format(amount);
-
-//             return <div className="text-right font-medium">{formatted}</div>;
-//         },
-//     },
-//     {
-//         id: "actions",
-//         cell: ({ row }) => {
-//             const payment = row.original;
-
-//             return (
-//                 <DropdownMenu>
-//                     <DropdownMenuTrigger asChild>
-//                         <Button variant="ghost" className="h-8 w-8 p-0">
-//                             <span className="sr-only">Open menu</span>
-//                             <MoreHorizontal className="h-4 w-4" />
-//                         </Button>
-//                     </DropdownMenuTrigger>
-//                     <DropdownMenuContent align="end">
-//                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-//                         <DropdownMenuItem
-//                             onClick={() =>
-//                                 navigator.clipboard.writeText(payment.id)
-//                             }
-//                         >
-//                             Copy payment ID
-//                         </DropdownMenuItem>
-//                         <DropdownMenuSeparator />
-//                         <DropdownMenuItem>View customer</DropdownMenuItem>
-//                         <DropdownMenuItem>
-//                             View payment details
-//                         </DropdownMenuItem>
-//                     </DropdownMenuContent>
-//                 </DropdownMenu>
-//             );
-//         },
-//     },
-// ];
-
 
 export interface MembershipData {
     _id: string;
@@ -146,6 +51,7 @@ export interface MembershipData {
     feeStatus: string;
     feePaid: number;
     userInfo: {
+        _id: string;
         name: string;
         email: string;
     };
@@ -370,3 +276,74 @@ export const dietPlanColumns: ColumnDef<DietPlanData>[] = [
         },
     },
 ];
+
+
+export const assignDietPlanToUserColumns: ColumnDef<any>[] = [
+    {
+        id: "Sr No",
+        header: "Sr. No.",
+        cell: ({ row }) => row.index + 1,
+        enableSorting: false,
+        enableHiding: false,
+    },
+    {
+        accessorKey: "clientName",
+        id: "Client Name",
+        header: "Client Name",
+        cell: ({ row }) => {
+            const name = row.original.templateName;
+            return <div>{name}</div>;
+        },
+    },
+    {
+        accessorKey: "clientDietPlan",
+        id: "Diet plan",
+        header: "Diet plan",
+        cell: ({ row }) => {
+            const name = row.original.templateName;
+            return <div>{name}</div>;
+        },
+    },
+    {
+        id: "edit",
+        header: "Edit Diet",
+        cell: ({ row }) => {
+            const dietPlan = row.original;
+
+            return (
+                <>
+                    <EditDietPlanDialog diet={dietPlan} />
+                </>
+            );
+        },
+    },
+
+    {
+        id: "delete",
+        cell: ({ row }) => {
+            const dietId = row.original._id;
+
+            return (
+                <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                        <Button variant="outline" className='text-red-500 hover:text-red-700'>
+                            <Trash2 className="mr-2 h-4 w-4" /> Delete
+                        </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                Do you really want to delete this membership?
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => deleteDiet(dietId)}>Continue</AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+            );
+        },
+    },
+]

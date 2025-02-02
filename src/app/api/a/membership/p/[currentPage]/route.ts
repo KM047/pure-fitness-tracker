@@ -117,6 +117,7 @@ export async function GET(
             // Step 4: Project the fields needed for the output
             {
                 $project: {
+                    "userInfo._id": 1,
                     "userInfo.name": 1,
                     "userInfo.email": 1,
                     "userInfo.phone": 1,

@@ -166,11 +166,22 @@ export const membersColumn: ColumnDef<MembershipData>[] = [
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <UserDetailsCard userDets={membership.userInfo} />
+                        <DropdownMenuSeparator />
+
                     </DropdownMenuContent>
                 </DropdownMenu>
             );
         },
     },
+    {
+        accessorKey: "userDiet",
+        header: "User Diet",
+        cell: ({ row }) => {
+            const userId = row.original.userInfo._id;
+            return <div><AssignDietPlan userId={userId} /></div>;
+        },
+
+    }
 ];
 
 
@@ -291,8 +302,8 @@ export const assignDietPlanToUserColumns: ColumnDef<any>[] = [
         id: "Client Name",
         header: "Client Name",
         cell: ({ row }) => {
-            const name = row.original.templateName;
-            return <div>{name}</div>;
+            const templateName = row.original.templateName;
+            return <div>{templateName}</div>;
         },
     },
     {
@@ -343,6 +354,46 @@ export const assignDietPlanToUserColumns: ColumnDef<any>[] = [
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>
+            );
+        },
+    },
+]
+
+
+export const clientDietPlan: ColumnDef<any>[] = [
+    {
+        id: "Sr No",
+        header: "Sr. No.",
+        cell: ({ row }) => row.index + 1,
+        enableSorting: false,
+        enableHiding: false,
+    },
+    {
+        accessorKey: "User name",
+        header: "Name",
+        id: "name",
+        cell: ({ row }) => {
+            const name = row.original.name as string;
+            return <div>{name}</div>;
+        },
+    },
+    {
+        accessorKey: "userDiet",
+        header: "User Diet",
+        cell: ({ row }) => {
+            const status = row.getValue("membershipStatus");
+
+            console.log("Row values :: ", row.original);
+
+            const dietPlan = {
+                meals: row.original.meals,
+                type: row.original.type,
+                templateName: row.original.planName,
+                notes: row.original.notes
+            };
+
+            return (
+                <DietView dietPlan={dietPlan} />
             );
         },
     },

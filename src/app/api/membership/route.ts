@@ -121,15 +121,12 @@ export async function GET(request: Request) {
         const memberships = await MembershipModel.aggregate([
             {
                 $lookup: {
-                    from: "monthsplans", // The MongoDB collection name for monthly plans
-                    localField: "_id", // The field in the Membership model
-                    foreignField: "membershipId", // The field in MonthlyPlan that references Membership
-                    as: "plans", // Alias for the joined data
+                    from: "monthsplans", 
+                    localField: "_id", 
+                    foreignField: "membershipId", 
+                    as: "plans", 
                 },
             },
-            // {
-            //     $unwind: "$plans",
-            // },
             {
                 $project: {
                     membershipName: 1,

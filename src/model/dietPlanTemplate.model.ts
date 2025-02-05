@@ -16,7 +16,6 @@ interface DietTemplate extends Document {
         postWorkout?: TemplateMeal;
         lunch: TemplateMeal;
         dinner: TemplateMeal;
-        snacks?: TemplateMeal[];
     };
     notes?: string;
 }
@@ -31,7 +30,6 @@ const dietTemplateSchema = new Schema(
             postWorkout: { type: Object },
             lunch: { type: Object, required: true },
             dinner: { type: Object, required: true },
-            snacks: [{ type: Object }],
         },
         notes: { type: String },
     },

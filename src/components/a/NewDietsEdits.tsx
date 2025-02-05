@@ -179,12 +179,10 @@ export function NewDietsEdits() {
             const response = await axiosInstance.post(
                 `/a/diet`,
                 {
-
                     templateName: template.templateName,
                     type: template.type,
                     meals: template.meals,
                     notes: template.notes
-
                 }
             );
 

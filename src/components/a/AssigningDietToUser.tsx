@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { DietPlanForm } from './DietForm';
 import {
     Dialog,
@@ -19,57 +19,84 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import { fetcherForGet } from "@/helpers";
+import useSWR from "swr";
+import { toast } from "@/hooks/use-toast";
+import axiosInstance from "@/helpers/axiosInstance";
 
 
 
 const AssignDietPlan = ({ userId }: { userId: string }) => {
-    const initialData = {
-        templateName: "",
-        type: "",
-        meals: {
-            breakfast: { name: "", items: [], calories: "", macros: { protein: "", carbs: "", fats: "" } },
-            preWorkout: { name: "", items: [], calories: "", macros: { protein: "", carbs: "", fats: "" } },
-            postWorkout: { name: "", items: [], calories: "", macros: { protein: "", carbs: "", fats: "" } },
-            lunch: { name: "", items: [], calories: "", macros: { protein: "", carbs: "", fats: "" } },
-            dinner: { name: "", items: [], calories: "", macros: { protein: "", carbs: "", fats: "" } },
-        },
-        notes: "",
-    };
+
+
+    const [initialData, setInitialData] = useState(null)
+
+    const { data, error, isLoading } = useSWR(`a/diet`, fetcherForGet, {
+        revalidateOnFocus: true,
+    });
+
+
 
     const handleSubmit = async (data: any) => {
-        console.log(`Assigning diet plan to user ${userId} with data:`, data);
+        // console.log(`Assigning diet plan to user ${userId} with data:`, data);
+
+        try {
+            const response = await axiosInstance.post("/a/diet/u", {
+                clientId: userId,
+                planName: data.templateName,
+                type: data.type,
+                meals: data.meals,
+                notes: data.templateName,
+            });
+
+            if (response) {
+                toast({
+                    title: "Success",
+                    description: response.data.message,
+                });
+            }
+        } catch (err) {
+            console.error("Error while assigning diet to user :", err);
+        } finally {
+        }
     };
+
+    const onChangeTemplate = (template: any) => {
+        setInitialData(template);
+    }
 
     return (
         <>
             <Dialog>
                 <DialogTrigger asChild>
-                    <Button variant="outline">Edit Diet Plan</Button>
+                    <Button variant="outline">New Diet Plan</Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[425px] h-auto overflow-y-auto max-h-[calc(100vh-2rem)] p-4">
                     <DialogHeader>
-                        <DialogTitle>Edit Diet Plan</DialogTitle>
+                        <DialogTitle>New Diet Plan</DialogTitle>
                         <DialogDescription>
-                            Update diet plan for your client.
+                            New diet plan for your client.
                         </DialogDescription>
                     </DialogHeader>
-                    <Select>
+                    <Select onValueChange={onChangeTemplate}>
                         <SelectTrigger className="w-[180px]">
                             <SelectValue placeholder="Select a diet plan" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent >
                             <SelectGroup>
                                 <SelectLabel>Diet Plans</SelectLabel>
-                                <SelectItem value="apple">Apple</SelectItem>
-                                <SelectItem value="banana">Banana</SelectItem>
-                                <SelectItem value="blueberry">Blueberry</SelectItem>
-                                <SelectItem value="grapes">Grapes</SelectItem>
-                                <SelectItem value="pineapple">Pineapple</SelectItem>
+                                {data && data.data &&
+                                    data.data.map((planTemp: any, idx: number) =>
+                                    (<>
+                                        <SelectItem key={idx} value={planTemp} onClick={onChangeTemplate}>{planTemp.templateName}</SelectItem>
+                                    </>))
+                                }
                             </SelectGroup>
                         </SelectContent>
                     </Select>
+                    {error && (<span className="text-sm text-red-500">{error}</span>)}
                     <div className="grid gap-4 py-4">
-                        <DietPlanForm initialData={initialData} onSubmit={handleSubmit} isSubmitting={false} />
+                        {initialData && (<DietPlanForm initialData={initialData} onSubmit={handleSubmit} isSubmitting={isLoading} />)}
                     </div>
                 </DialogContent>
             </Dialog>

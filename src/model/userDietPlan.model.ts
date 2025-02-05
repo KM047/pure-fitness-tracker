@@ -14,11 +14,10 @@ interface IDietPlan {
         breakfast: IMeal;
         lunch: IMeal;
         dinner: IMeal;
-        snacks: IMeal[];
         preWorkout: IMeal;
         postWorkout: IMeal;
     };
-    //weeklySchedule: { day: string; meals: IMeal[] }[];
+
     notes: string;
     type: string;
 }
@@ -42,7 +41,7 @@ const mealSchema = new Schema({
 
 const clientDietPlanSchema = new Schema(
     {
-        clientId: { type: Schema.Types.ObjectId, ref: "User" },
+        clientId: { type: Schema.Types.ObjectId, ref: "User", unique: true },
         planName: { type: String, required: true },
         meals: {
             breakfast: mealSchema,
@@ -50,15 +49,7 @@ const clientDietPlanSchema = new Schema(
             postWorkout: mealSchema,
             lunch: mealSchema,
             dinner: mealSchema,
-            snacks: [mealSchema],
         },
-        // i will put this optional
-        // weeklySchedule: [
-        //     {
-        //         day: { type: String, required: true },
-        //         meals: [mealSchema],
-        //     },
-        // ],
         notes: { type: String },
         type: { type: String, required: true },
     },

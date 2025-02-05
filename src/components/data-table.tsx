@@ -45,7 +45,7 @@ export function DataTable<TData, TValue>({
     columns,
     data,
     filterColumn = "email",
-    props
+    props = null
 }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnFilters, setColumnFilters] =
@@ -203,16 +203,16 @@ export function DataTable<TData, TValue>({
                     <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => props.setCurrentPage(props.currentPage - 1)}
-                        disabled={props.currentPage <= 1}
+                        onClick={() => props ? props?.setCurrentPage(props.currentPage - 1) : table.previousPage()}
+                        disabled={!table.getCanPreviousPage()}
                     >
                         Previous
                     </Button>
                     <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => props.setCurrentPage(props.currentPage + 1)}
-                        // disabled={props.currentPage <= 0}
+                        onClick={() => props ? props?.setCurrentPage(props.currentPage + 1) : table.nextPage()}
+                        disabled={!table.getCanNextPage()}
                     >
                         Next
                     </Button>

@@ -5,6 +5,77 @@ import UserDietPlanModel from "@/model/userDietPlan.model";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { NextRequest } from "next/server";
 
+// This route is to get the details of the diet plan of the all users
+
+export async function GET(request: NextRequest) {
+    await dbConnect();
+
+    try {
+        const session = await getServerSession(authOptions);
+
+        const user = session?.user as User;
+
+        if (!session || !user) {
+            return jsonResponse({
+                success: false,
+                message: "Not authenticated",
+                status: 401,
+            });
+        }
+
+        if (!user.role || user?.role !== "ADMIN") {
+            return jsonResponse({
+                success: false,
+                message:
+                    "Not authorized to access this route. only can an admin can access this route.",
+                status: 401,
+            });
+        }
+
+        const allDietPlans = await UserDietPlanModel.aggregate([
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "clientId",
+                    foreignField: "_id",
+                    as: "userDetails",
+                },
+            },
+            {
+                $unwind: "$userDetails",
+            },
+            {
+                $project: {
+                    _id: 1,
+                    userId: 1,
+                    name: "$userDetails.name",
+                    dietPlan: "$dietPlan",
+                    planName: 1,
+                    meals: 1,
+                    notes: 1,
+                    type: 1,
+                },
+            },
+        ]);
+
+        if (!allDietPlans) {
+            throw new Error("Error while fetching the diet plans");
+        }
+
+        return jsonResponse({
+            success: true,
+            message: "Diet plans fetched successfully",
+            data: allDietPlans,
+            status: 200,
+        });
+    } catch (error) {
+        return errorResponse({
+            error,
+            message: "Error while fetching the diet plans",
+        });
+    }
+}
+
 // This route is to create the diet plan of the user by userId
 export async function POST(request: NextRequest) {
     await dbConnect();

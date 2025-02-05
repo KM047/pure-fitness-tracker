@@ -41,8 +41,8 @@ const adminData = {
                     url: "/dashboard/a/memberships",
                 },
                 {
-                    title: "Communication",
-                    url: "#",
+                    title: "User Diet",
+                    url: "/dashboard/a/clients/diet",
                 },
             ],
         },

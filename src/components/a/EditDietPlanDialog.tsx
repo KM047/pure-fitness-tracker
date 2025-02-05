@@ -20,10 +20,10 @@ const EditDietPlanDialog = ({ diet }: any) => {
     // console.log("Edited diet plan : ", diet._id)
 
     const [template, setTemplate] = useState({
-        templateName: diet.templateName || "",
-        type: diet.type || "",
-        meals: diet.meals || {},
-        notes: diet.notes || "",
+        templateName: diet?.templateName || "",
+        type: diet?.type || "",
+        meals: diet?.meals || {},
+        notes: diet?.notes || "",
     });
 
     const form = useForm({
@@ -110,7 +110,7 @@ const EditDietPlanDialog = ({ diet }: any) => {
     };
 
     const onSubmit = async (data: any) => {
-        console.log("Submitting data:", template);
+        // console.log("Submitting data:", template);
         setIsSubmitting(true);
         try {
             const response = await axiosInstance.put("/a/diet", {

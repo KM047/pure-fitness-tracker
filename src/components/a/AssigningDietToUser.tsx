@@ -35,12 +35,13 @@ const AssignDietPlan = ({ userId }: { userId: string }) => {
         revalidateOnFocus: true,
     });
 
-
-
     const handleSubmit = async (data: any) => {
         // console.log(`Assigning diet plan to user ${userId} with data:`, data);
 
         try {
+
+            // const exitDietPlanUser = 
+
             const response = await axiosInstance.post("/a/diet/u", {
                 clientId: userId,
                 planName: data.templateName,

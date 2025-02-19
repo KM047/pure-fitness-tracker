@@ -6,6 +6,7 @@ import Loader from "@/components/Loader";
 import { fetcherForGet, fetcherForPost } from "@/helpers";
 import axiosInstance from "@/helpers/axiosInstance";
 import { toast } from "@/hooks/use-toast";
+import { useMembershipStore } from "@/store/membershipStore";
 import { useState, useEffect } from "react";
 import useSWR from "swr";
 
@@ -29,7 +30,17 @@ export default function DemoPage() {
         revalidateOnFocus: true,
     });
 
-    // console.log("Data -> ", data)
+    const { paginatedData, loading, fetchMemberships, setPaginatedData } = useMembershipStore();
+
+    // useEffect(() => {
+    //     fetchMemberships(currentPage, 10);
+    // }, [currentPage, fetchMemberships]);
+
+    useEffect(() => {
+        setPaginatedData(data?.data.membership[0].paginatedData || []);
+    }, [data, setPaginatedData]);
+
+    console.log("This membership data is coming from the store : ", paginatedData);
 
 
     // Update state when data changes

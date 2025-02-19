@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
             {
                 $project: {
                     _id: 1,
-                    userId: 1,
+                    clientId: 1,
                     name: "$userDetails.name",
                     dietPlan: "$dietPlan",
                     planName: 1,

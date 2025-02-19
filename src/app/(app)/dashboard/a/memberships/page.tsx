@@ -38,6 +38,7 @@ import { toast } from '@/hooks/use-toast';
 import { MembershipEdits } from '@/components/a/MembershipEdits';
 import { NewMembershipEdits } from '@/components/a/NewMembership';
 import { fetcherForGet } from '@/helpers';
+import { useMembershipStore } from '@/store/membershipStore';
 
 async function deleteMembership(membershipId: string) {
 
@@ -265,6 +266,15 @@ export default function MembershipPage() {
     const { data, error, isLoading } = useSWR("membership", fetcherForGet, {
         revalidateOnFocus: false,
     });
+
+    const { paginatedData, loading, fetchMemberships } = useMembershipStore();
+
+    useEffect(() => {
+        fetchMemberships(currentPage);
+    }, [currentPage, fetchMemberships]);
+
+
+    console.log("This data is coming from the store in membership page : ", paginatedData);
 
 
     return (
